@@ -6,7 +6,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsToolti
 import { Activity, AlertTriangle, Zap, MapPin, X, Send, Bell, Search, UploadCloud, Users } from 'lucide-react';
 import './index.css';
 
-const API_BASE = 'http://127.0.0.1:8000';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
 export default function App() {
   const [riskZones, setRiskZones] = useState([]);
