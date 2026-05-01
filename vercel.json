@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python",
+      "config": { "includeFiles": "bescom_raw/**" }
+    },
+    {
+      "src": "dashboard/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "api/index.py"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/dashboard/$1"
+    }
+  ]
+}
