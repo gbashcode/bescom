@@ -1,0 +1,9 @@
+bescom_raw/raw_15min.csv
+node_modules/
+__pycache__/
+*.duckdb
+*.db
+.env
+.DS_Store
+dashboard/node_modules/
+dashboard/dist/
