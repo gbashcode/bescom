@@ -1,4 +1,5 @@
-bescom_raw/raw_15min.csv
+# Data files included for demo deployment
+# bescom_raw/raw_15min.csv
 node_modules/
 __pycache__/
 *.duckdb
