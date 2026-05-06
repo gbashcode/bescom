@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { MapContainer, TileLayer, CircleMarker, Popup, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -7,6 +7,41 @@ import { Activity, AlertTriangle, Zap, MapPin, X, Send, Bell, Search, UploadClou
 import './index.css';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+
+/* ── Floating Particles Component ── */
+function FloatingParticles({ count = 40 }) {
+  const particles = useMemo(() => {
+    return Array.from({ length: count }, (_, i) => {
+      const size = Math.random() * 4 + 2;           // 2–6 px
+      const left = Math.random() * 100;              // 0–100 %
+      const duration = Math.random() * 17 + 8;       // 8–25 s
+      const delay = Math.random() * duration * -1;   // stagger start
+      const opacity = Math.random() * 0.35 + 0.08;   // 0.08–0.43
+      const drift = (Math.random() - 0.5) * 120;     // -60 … 60 px horizontal drift
+      return { id: i, size, left, duration, delay, opacity, drift };
+    });
+  }, [count]);
+
+  return (
+    <div className="particles-container">
+      {particles.map(p => (
+        <div
+          key={p.id}
+          className="particle"
+          style={{
+            width: p.size,
+            height: p.size,
+            left: `${p.left}%`,
+            animationDuration: `${p.duration}s`,
+            animationDelay: `${p.delay}s`,
+            '--p-opacity': p.opacity,
+            '--p-drift': `${p.drift}px`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
 
 export default function App() {
   const [riskZones, setRiskZones] = useState([]);
@@ -90,26 +125,29 @@ export default function App() {
   };
 
   return (
-    <div className="dashboard-container">
-      <header style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <>
+      <FloatingParticles />
+
+      <div className="dashboard-container">
+        <header style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ background: 'transparent', border: '2px solid var(--accent)', padding: '0.75rem', borderRadius: '12px', boxShadow: 'inset 0 0 10px var(--accent-glow), 0 0 15px var(--accent-glow)' }}>
-            <Activity size={28} color="var(--accent)" />
+          <div style={{ background: 'var(--panel-bg)', border: '1px solid var(--panel-border)', padding: '0.75rem', borderRadius: '16px' }}>
+            <Activity size={24} color="var(--text-main)" />
           </div>
           <div>
-            <h1 style={{ margin: 0, fontSize: '2rem', fontWeight: 700, letterSpacing: '-1px', textTransform: 'uppercase', color: '#fff', textShadow: '0 0 15px rgba(255,255,255,0.3)' }}>
-              GridSense <span style={{ color: 'var(--accent)', textShadow: '0 0 15px var(--accent-glow)' }}>AI</span>
+            <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 600, letterSpacing: '-0.5px', color: '#fff' }}>
+              GridSense AI
             </h1>
-            <p style={{ color: 'var(--accent)', fontSize: '0.9rem', margin: '0 0 0 0', letterSpacing: '1px', textTransform: 'uppercase' }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 0 0', fontWeight: 400 }}>
               Predictive Grid Monitoring // Theft Detection
             </p>
           </div>
         </div>
         
         <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-          <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '0.25rem', border: '1px solid rgba(255,255,255,0.1)' }}>
-            <button onClick={() => setActiveTab('live')} style={{ background: activeTab === 'live' ? 'var(--accent)' : 'transparent', color: activeTab === 'live' ? '#000' : 'var(--text-muted)', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', fontFamily: 'Space Grotesk', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>Live Dashboard</button>
-            <button onClick={() => setActiveTab('admin')} style={{ background: activeTab === 'admin' ? 'var(--accent)' : 'transparent', color: activeTab === 'admin' ? '#000' : 'var(--text-muted)', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', fontFamily: 'Space Grotesk', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>Data Scientist / Admin</button>
+          <div style={{ display: 'flex', background: 'rgba(255,255,255,0.02)', borderRadius: '9999px', padding: '0.25rem', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <button onClick={() => setActiveTab('live')} style={{ background: activeTab === 'live' ? '#fff' : 'transparent', color: activeTab === 'live' ? '#000' : 'var(--text-muted)', border: 'none', padding: '0.5rem 1.25rem', borderRadius: '9999px', fontFamily: 'Inter', fontWeight: 500, cursor: 'pointer', transition: 'all 0.2s' }}>Live Dashboard</button>
+            <button onClick={() => setActiveTab('admin')} style={{ background: activeTab === 'admin' ? '#fff' : 'transparent', color: activeTab === 'admin' ? '#000' : 'var(--text-muted)', border: 'none', padding: '0.5rem 1.25rem', borderRadius: '9999px', fontFamily: 'Inter', fontWeight: 500, cursor: 'pointer', transition: 'all 0.2s' }}>Data Scientist / Admin</button>
           </div>
           
           <div style={{ position: 'relative', cursor: 'pointer' }}>
@@ -135,15 +173,15 @@ export default function App() {
           />
           <button 
             onClick={() => setShowLinemenModal(true)}
-            style={{ background: 'transparent', color: 'var(--amber)', border: '1px solid var(--amber)', padding: '0.5rem 1rem', borderRadius: '8px', fontFamily: 'Space Grotesk', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '9999px', fontFamily: 'Inter', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
           >
-            <Users size={18} /> View Roster
+            <Users size={16} /> View Roster
           </button>
           <button 
             onClick={() => document.getElementById('csvUpload').click()}
-            style={{ background: 'transparent', color: 'var(--accent)', border: '1px solid var(--accent)', padding: '0.5rem 1rem', borderRadius: '8px', fontFamily: 'Space Grotesk', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '9999px', fontFamily: 'Inter', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
           >
-            <UploadCloud size={18} /> Upload CSV
+            <UploadCloud size={16} /> Upload CSV
           </button>
 
           <button 
@@ -154,7 +192,7 @@ export default function App() {
               const a = document.createElement('a');
               a.href = url; a.download = 'GridSense_Anomalies.csv'; a.click();
             }}
-            style={{ background: 'var(--accent)', color: '#000', border: 'none', padding: '0.5rem 1rem', borderRadius: '8px', fontFamily: 'Space Grotesk', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 0 15px var(--accent-glow)' }}
+            style={{ background: '#fff', color: '#000', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '9999px', fontFamily: 'Inter', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
           >
             Download CSV
           </button>
@@ -164,27 +202,27 @@ export default function App() {
       {activeTab === 'live' ? (
         <>
           <div className="top-bar">
-            <div className="stat-card glass-panel red-border">
-              <div style={{ color: 'var(--red)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', fontSize: '0.8rem' }}>
+            <div className="stat-card glass-panel">
+              <div style={{ color: 'var(--red)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500, fontSize: '0.85rem' }}>
                 <AlertTriangle size={16} /> Est. ₹ At Risk Today
               </div>
               <div className="stat-value red">
                 ₹{(stats.totalRisk / 100000).toFixed(2)}L
               </div>
             </div>
-            <div className="stat-card glass-panel amber-border">
-              <div style={{ color: 'var(--amber)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', fontSize: '0.8rem' }}>
+            <div className="stat-card glass-panel">
+              <div style={{ color: 'var(--amber)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500, fontSize: '0.85rem' }}>
                 <Zap size={16} /> Overloads Predicted (18:00)
               </div>
               <div className="stat-value amber">
-                {stats.overloads} DTs
+                {stats.overloads} <span style={{fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 400}}>DTs</span>
               </div>
             </div>
-            <div className="stat-card glass-panel accent-border">
-              <div style={{ color: 'var(--accent)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', fontSize: '0.8rem' }}>
+            <div className="stat-card glass-panel">
+              <div style={{ color: 'var(--accent)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500, fontSize: '0.85rem' }}>
                 <MapPin size={16} /> Theft Flags Active
               </div>
-              <div className="stat-value" style={{ color: '#fff', textShadow: '0 0 15px rgba(255,255,255,0.4)' }}>
+              <div className="stat-value" style={{ color: '#fff' }}>
                 {anomalies.length}
               </div>
             </div>
@@ -194,19 +232,19 @@ export default function App() {
         <div className="glass-panel" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column' }}>
           <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <MapPin size={20} color="var(--accent)" style={{ filter: 'drop-shadow(0 0 10px var(--accent))' }} /> Zone Risk Heatmap
+              <MapPin size={18} color="var(--accent)" /> Zone Risk Heatmap
             </div>
             <select 
               value={mapView}
               onChange={(e) => setMapView(e.target.value)}
-              style={{ background: 'transparent', color: 'var(--text-muted)', border: '1px solid rgba(255,255,255,0.1)', padding: '0.25rem 0.5rem', borderRadius: '4px', fontFamily: 'Space Grotesk', fontSize: '0.75rem', outline: 'none' }}
+              style={{ background: 'var(--bg-base)', color: 'var(--text-main)', border: '1px solid var(--panel-border)', padding: '0.4rem 0.8rem', borderRadius: '9999px', fontFamily: 'Inter', fontSize: '0.85rem', outline: 'none' }}
             >
               <option value="risk">View: Capacity Risk</option>
               <option value="hotspot">View: Theft Hotspots</option>
               <option value="route">View: Inspection Route Map</option>
             </select>
           </div>
-          <div style={{ flex: 1, borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(0,240,255,0.2)', boxShadow: 'inset 0 0 20px rgba(0,240,255,0.05)', minHeight: '300px' }}>
+          <div style={{ flex: 1, borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--panel-border)', minHeight: '300px' }}>
             <MapContainer center={[12.9716, 77.5946]} zoom={11} style={{ height: '100%', width: '100%' }}>
               <TileLayer
                 url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
@@ -245,11 +283,11 @@ export default function App() {
         <div className="glass-panel" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column' }}>
           <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <AlertTriangle size={20} color="var(--red)" style={{ filter: 'drop-shadow(0 0 10px var(--red))' }} /> Top Anomalies (Triage)
+              <AlertTriangle size={18} color="var(--red)" /> Top Anomalies
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.05)', padding: '0.25rem 0.5rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-base)', padding: '0.4rem 0.8rem', borderRadius: '9999px', border: '1px solid var(--panel-border)' }}>
               <Search size={14} color="var(--text-muted)" style={{ marginRight: '0.5rem' }} />
-              <input type="text" placeholder="Search Meter ID..." style={{ background: 'transparent', border: 'none', color: '#fff', outline: 'none', fontFamily: 'Space Grotesk', fontSize: '0.8rem', width: '120px' }} />
+              <input type="text" placeholder="Search Meter ID..." style={{ background: 'transparent', border: 'none', color: '#fff', outline: 'none', fontFamily: 'Inter', fontSize: '0.85rem', width: '120px' }} />
             </div>
           </div>
           <div className="table-container">
@@ -456,16 +494,16 @@ export default function App() {
         <div className="modal-overlay" onClick={() => setSelectedMeter(null)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header" style={{ marginBottom: '2rem' }}>
-              <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '2rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                <Zap color="var(--accent)" size={32} style={{ filter: 'drop-shadow(0 0 15px var(--accent))' }} /> Meter Target: <span style={{ color: 'var(--accent)' }}>{selectedMeter.meter_id}</span>
+              <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.6rem', fontWeight: 600 }}>
+                <Zap color="var(--accent)" size={28} /> Meter Target: <span style={{ color: 'var(--accent)' }}>{selectedMeter.meter_id}</span>
               </h2>
               <button className="close-btn" onClick={() => setSelectedMeter(null)}><X size={28} /></button>
             </div>
             
             <div className="reason-box">
-              <AlertTriangle color="var(--red)" size={28} style={{ filter: 'drop-shadow(0 0 10px var(--red))' }} />
+              <AlertTriangle color="var(--red)" size={24} />
               <div>
-                <strong style={{ display: 'block', marginBottom: '0.4rem', color: '#fff', textTransform: 'uppercase', letterSpacing: '1px' }}>Anomaly Detected:</strong> 
+                <strong style={{ display: 'block', marginBottom: '0.4rem', color: '#fff', fontWeight: 600 }}>Anomaly Detected:</strong> 
                 <span style={{ color: 'var(--text-muted)' }}>{selectedMeter.reason}</span>
               </div>
             </div>
@@ -475,11 +513,11 @@ export default function App() {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={meterData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(0, 240, 255, 0.1)" vertical={false} />
-                    <XAxis dataKey="time" stroke="var(--accent)" tick={{ fill: 'var(--accent)', fontFamily: 'Space Grotesk' }} axisLine={false} tickLine={false} />
-                    <YAxis yAxisId="left" stroke="var(--accent)" tick={{ fill: 'var(--accent)', fontFamily: 'Space Grotesk' }} axisLine={false} tickLine={false} />
-                    <YAxis yAxisId="right" orientation="right" stroke="var(--amber)" tick={{ fill: 'var(--amber)', fontFamily: 'Space Grotesk' }} axisLine={false} tickLine={false} domain={['dataMin - 2', 'dataMax + 2']} />
+                    <XAxis dataKey="time" stroke="var(--text-muted)" tick={{ fill: 'var(--text-muted)', fontFamily: 'Inter' }} axisLine={false} tickLine={false} />
+                    <YAxis yAxisId="left" stroke="var(--text-muted)" tick={{ fill: 'var(--text-muted)', fontFamily: 'Inter' }} axisLine={false} tickLine={false} />
+                    <YAxis yAxisId="right" orientation="right" stroke="var(--amber)" tick={{ fill: 'var(--amber)', fontFamily: 'Inter' }} axisLine={false} tickLine={false} domain={['dataMin - 2', 'dataMax + 2']} />
                     <RechartsTooltip 
-                      contentStyle={{ backgroundColor: 'rgba(3, 3, 5, 0.95)', border: '1px solid var(--accent)', borderRadius: '12px', backdropFilter: 'blur(10px)', boxShadow: '0 0 20px rgba(0,240,255,0.2)' }} 
+                      contentStyle={{ backgroundColor: 'var(--panel-bg)', border: '1px solid var(--panel-border)', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }} 
                     />
                     <Line yAxisId="left" type="monotone" dataKey="kW" stroke="var(--accent)" strokeWidth={4} dot={false} activeDot={{ r: 8, fill: '#fff', stroke: 'var(--accent)', strokeWidth: 3 }} name="Load (kW)" />
                     <Line yAxisId="right" type="monotone" dataKey="temp" stroke="var(--amber)" strokeWidth={2} strokeDasharray="5 5" dot={false} name="Temp (°C)" />
@@ -499,18 +537,18 @@ export default function App() {
                   </LineChart>
                 </ResponsiveContainer>
               ) : (
-                <div style={{ color: 'var(--accent)', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', fontSize: '1.4rem', textTransform: 'uppercase', letterSpacing: '2px' }}>
-                  <Activity size={32} className="spin" style={{ marginRight: '1.5rem', filter: 'drop-shadow(0 0 15px var(--accent))' }} /> Establishing Link...
+                <div style={{ color: 'var(--text-muted)', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', fontSize: '1.2rem', fontWeight: 500 }}>
+                  <Activity size={28} className="spin" style={{ marginRight: '1rem', color: 'var(--accent)' }} /> Establishing Link...
                 </div>
               )}
             </div>
             
             <div style={{ marginTop: '3rem', display: 'flex', gap: '1.5rem', justifyContent: 'flex-end', alignItems: 'center' }}>
-              <input 
+                <input 
                 type="text" 
                 id="feedbackReason"
                 placeholder="Reason (optional)..." 
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '0.5rem', borderRadius: '6px', outline: 'none', fontFamily: 'Space Grotesk' }}
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '0.75rem 1rem', borderRadius: '8px', outline: 'none', fontFamily: 'Inter' }}
               />
               <button 
                 className="btn btn-secondary"
@@ -588,5 +626,6 @@ export default function App() {
         </div>
       )}
     </div>
+    </>
   );
 }
